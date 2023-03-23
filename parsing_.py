@@ -10,14 +10,24 @@ PoS: We note that the vector representing our input is too sparse
 Propose a solution.
 ----------------------------------------------------------
 A1:
+One solution to reduce sparsity in the input vector is to use a dimensionality reduction technique such as Principal Component Analysis (PCA)
+or Singular Value Decomposition (SVD). These techniques can be used to reduce the dimensionality of the input vector by projecting it onto 
+a lower-dimensional subspace while preserving as much of the original information as possible. This can result in a more compact representation 
+of the input vector, with fewer zeros and less redundancy, which can lead to a smaller and more efficient model.
+
+Another solution is to use feature engineering techniques to extract more informative features from the input data. 
+This can involve designing more sophisticated PoS taggers that take into account additional contextual information or 
+using pre-trained word embeddings that capture more semantic information about the words in the input. By using more informative features, 
+we can reduce the sparsity of the input vector and improve the accuracy of the model.
 
 ----------------------------------------------------------
 Q2:
-PoS: We note that the model is not really accurate.
+PoS: We note that the model is not really accurate. (OH COURSE IT'S NOTTT:(()
 It is far from being acceptable.
 Propose a solution to enhance MEMM prediction.
 ----------------------------------------------------------
 A2:
+Add regularization to the loss function to prevent overfitting?
 
 ----------------------------------------------------------
 Q3:
@@ -25,6 +35,17 @@ CKY: What is the benefit and the downfall of using PoS in
 CKY parsing instead of a hand-prepared lexicon?
 ----------------------------------------------------------
 A3:
+The benefit of using PoS in CKY parsing instead of a hand-prepared lexicon is that it can be more flexible 
+and adaptable to different domains and languages. A hand-prepared lexicon requires human effort to compile and maintain, 
+which can be time-consuming and expensive. On the other hand, PoS tagging can be automated using machine learning techniques, which can save time and effort.
+
+The downfall of using PoS in CKY parsing is that it may not be as accurate as a hand-prepared lexicon, 
+especially in cases where there are many ambiguous words or rare words that are not well represented in the training data. 
+In addition, PoS tagging may not capture all the nuances of language, such as idiomatic expressions or syntactic constructions 
+that are not easily captured by a simple PoS tag.
+
+Overall, the choice between using PoS tagging or a hand-prepared lexicon depends on the specific requirements of the application 
+and the trade-off between accuracy and efficiency.
 
 ----------------------------------------------------------
 Q4:
@@ -32,6 +53,37 @@ CKY: Can we change CKY to handle unitary productions (A --> B)?
 If yes, how? If no, why?
 ----------------------------------------------------------
 A4: 
+Yes, CKY can be modified to handle unitary productions (A -> B).
+
+The modification requires updating the second loop of the parse function to handle unitary productions. 
+Instead of iterating over a range of values from i to j, the loop would need to iterate over all possible unitary productions in the grammar for each cell in the table. 
+For each unitary production, the function would check if the cell contains the right-hand side of the unitary production 
+and add the left-hand side to the current cell if it is not already present.
+Like this:
+for i in range(n-2, -1, -1):
+    for j in range(i+1, n):
+        # Handle unitary productions
+        for cell in table[i][j]:
+            for lhs, rhs in self.gram:
+                if len(rhs) == 1 and rhs[0] in cell:
+                    if lhs not in cell:
+                        table[i][j].append((lhs, -1, -1, -1))
+
+        # Handle binary productions
+        for k in range(i, j):
+            for lhs, rhs1, rhs2 in self.gram:
+                i_rhs1 = -1
+                for index, cell in enumerate(table[i][k]):
+                    if rhs1 in cell:
+                        i_rhs1 = index
+                        break
+                i_rhs2 = -1
+                for index, cell in enumerate(table[k+1][j]):
+                    if rhs2 in cell:
+                        i_rhs2 = index
+                        break
+                if i_rhs1 != -1 and i_rhs2 != -1:
+                    table[i][j].append((lhs, k, i_rhs1, i_rhs2))
 
 """
 
